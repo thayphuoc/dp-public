@@ -1388,7 +1388,9 @@
         timerSeconds--;
         if (timerSeconds <= 0) {
           clearInterval(timerInterval);
-          alert('Đã hết thời gian làm bài 1h15 phút! Hệ thống sẽ tự động nộp bài.');
+          if (submitModal) submitModal.classList.remove('active');
+          warningTitle.textContent = '⏱️ ĐÃ HẾT THỜI GIAN LÀM BÀI!';
+          warningText.textContent = 'Thời gian làm bài 1h15 phút đã kết thúc. Hệ thống đang tự động nộp bài làm của bạn...';
           submitQuiz();
           return;
         }
