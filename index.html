@@ -1,1878 +1,1624 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Khảo sát Đánh giá Kiến thức IELTS & Kỹ năng - 2G Education</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IELTS Computer-Based Test — Dynamic Platform</title>
+
+  <!-- Google Fonts: Inter & Merriweather -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap"
     rel="stylesheet">
+
+  <!-- Supabase JS SDK v2 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
+    /* ==========================================================================
+       1. CORE DESIGN TOKENS & CSS RESET (AUTHENTIC IELTS CBT)
+       ========================================================================== */
     :root {
-      --primary: #4f46e5;
-      --primary-hover: #4338ca;
-      --primary-light: #eef2ff;
-      --secondary: #0ea5e9;
-      --accent: #f59e0b;
-      --danger: #ef4444;
-      --success: #10b981;
-      --dark: #0f172a;
-      --dark-card: #1e293b;
-      --light-bg: #f8fafc;
-      --card-bg: rgba(255, 255, 255, 0.94);
-      --border: #e2e8f0;
-      --text: #1e293b;
-      --text-muted: #64748b;
-      --radius-lg: 16px;
-      --radius-md: 12px;
-      --radius-sm: 8px;
-      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
-      --shadow-lg: 0 20px 30px -10px rgba(79, 70, 229, 0.15);
+      --primary-blue: #1e3c72;
+      --secondary-blue: #2a5298;
+      --accent-blue: #0984e3;
+      --light-bg: #f5f6fa;
+      --card-bg: #ffffff;
+      --border-color: #dcdde1;
+      --text-dark: #2d3436;
+      --text-muted: #636e72;
+      --cbt-yellow: #fdcb6e;
+      --cbt-yellow-hover: #ffeaa7;
+      --success-green: #00b894;
+      --danger-red: #d63031;
+      --warning-orange: #e17055;
+      --header-height: 56px;
+      --footer-height: 52px;
+      --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-passage: 'Merriweather', Georgia, serif;
+      --hl-yellow: rgba(254, 235, 130, 0.7);
+      --hl-green: rgba(186, 247, 186, 0.7);
+      --hl-pink: rgba(255, 192, 203, 0.7);
+    }
+
+    body.dark-mode {
+      --light-bg: #1e272e;
+      --card-bg: #2f3640;
+      --border-color: #485460;
+      --text-dark: #f5f6fa;
+      --text-muted: #d2dae2;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Be Vietnam Pro', 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      -webkit-tap-highlight-color: transparent;
     }
 
     body {
-      background: linear-gradient(135deg, #f0f4ff 0%, #e6eeef 50%, #f8fafc 100%);
-      color: var(--text);
-      min-height: 100vh;
+      font-family: var(--font-ui);
+      background-color: var(--light-bg);
+      color: var(--text-dark);
+      overflow-x: hidden;
+      height: 100vh;
       display: flex;
       flex-direction: column;
+      user-select: text;
     }
 
-    .app-container {
-      width: 100%;
-      max-width: 1240px;
-      margin: 0 auto;
-      padding: 16px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
+    .hidden {
+      display: none !important;
     }
 
-    /* HEADER */
-    header {
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(12px);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 14px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: var(--shadow);
-      margin-bottom: 16px;
-      position: sticky;
-      top: 10px;
-      z-index: 100;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .brand-logo {
-      width: 40px;
-      height: 40px;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: white;
-      font-weight: 800;
-      border-radius: 10px;
+    .flex-center {
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.2rem;
-      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
     }
 
-    .brand-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--dark);
+    /* Buttons & Inputs */
+    button,
+    input,
+    select,
+    textarea {
+      font-family: inherit;
     }
 
-    .brand-sub {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      font-weight: 500;
-    }
-
-    .header-widgets {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .timer-badge {
-      background: #fef2f2;
-      border: 1px solid #fecaca;
-      color: #dc2626;
-      padding: 8px 14px;
-      border-radius: var(--radius-md);
-      font-weight: 700;
-      font-size: 0.95rem;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow: 0 2px 6px rgba(220, 38, 38, 0.1);
-    }
-
-    .timer-badge.warning {
-      animation: pulse 1s infinite alternate;
-    }
-
-    @keyframes pulse {
-      0% {
-        transform: scale(1);
-        background: #fee2e2;
-      }
-
-      100% {
-        transform: scale(1.05);
-        background: #fca5a5;
-        color: #991b1b;
-      }
-    }
-
-    .user-badge {
-      background: var(--primary-light);
-      color: var(--primary);
-      padding: 8px 14px;
-      border-radius: var(--radius-md);
-      font-weight: 600;
-      font-size: 0.85rem;
-      display: none;
-    }
-
-    .btn-toggle-nav {
-      display: none;
-      background: var(--light-bg);
-      border: 1px solid var(--border);
-      padding: 8px 12px;
-      border-radius: var(--radius-md);
-      font-weight: 600;
-      font-size: 0.85rem;
-      cursor: pointer;
-    }
-
-    /* SCREEN MANAGEMENT */
-    .screen {
-      display: none;
-      width: 100%;
-    }
-
-    .screen.active {
-      display: block;
-      animation: fadeIn 0.4s ease-out;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(8px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* WELCOME SCREEN */
-    .welcome-card {
-      background: var(--card-bg);
-      backdrop-filter: blur(16px);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 32px;
-      box-shadow: var(--shadow-lg);
-      max-width: 800px;
-      margin: 20px auto;
-    }
-
-    .welcome-title {
-      font-size: 1.6rem;
-      font-weight: 800;
-      color: var(--dark);
-      margin-bottom: 8px;
-      text-align: center;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .welcome-subtitle {
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      margin-bottom: 24px;
-    }
-
-    .notes-box {
-      background: #f8fafc;
-      border-left: 4px solid var(--primary);
-      border-radius: var(--radius-md);
-      padding: 20px;
-      margin-bottom: 24px;
-    }
-
-    .notes-box h4 {
-      font-size: 0.95rem;
-      color: var(--dark);
-      margin-bottom: 10px;
-    }
-
-    .notes-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .notes-list li {
-      font-size: 0.88rem;
-      line-height: 1.5;
-      color: #334155;
-      position: relative;
-      padding-left: 20px;
-    }
-
-    .notes-list li::before {
-      content: "•";
-      position: absolute;
-      left: 6px;
-      color: var(--primary);
-      font-weight: bold;
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .form-group.full-width {
-      grid-column: span 2;
-    }
-
-    .form-group label {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--dark);
-    }
-
-    .form-group input,
-    .form-group select {
-      padding: 12px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-md);
-      font-size: 0.95rem;
-      outline: none;
-      transition: all 0.2s;
-      background: white;
-    }
-
-    .form-group input:focus,
-    .form-group select:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
-    }
-
-    .btn-start {
-      width: 100%;
-      padding: 16px;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
       color: white;
       border: none;
-      border-radius: var(--radius-md);
-      font-size: 1.05rem;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: var(--shadow-lg);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .btn-start:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 15px 25px rgba(79, 70, 229, 0.25);
-    }
-
-    /* QUIZ MAIN LAYOUT */
-    .quiz-layout {
-      display: grid;
-      grid-template-columns: 1fr 360px;
-      gap: 20px;
-      align-items: start;
-    }
-
-    .question-card {
-      background: var(--card-bg);
-      backdrop-filter: blur(16px);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 28px;
-      box-shadow: var(--shadow);
-      display: flex;
-      flex-direction: column;
-      min-height: 540px;
-    }
-
-    .progress-header {
-      margin-bottom: 20px;
-    }
-
-    .progress-info {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-
-    .progress-title {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .progress-status-badge {
-      background: linear-gradient(135deg, var(--primary-light), #e0e7ff);
-      color: var(--primary);
-      font-size: 0.85rem;
-      font-weight: 800;
-      padding: 4px 12px;
-      border-radius: 20px;
-      border: 1px solid rgba(79, 70, 229, 0.2);
-    }
-
-    .progress-bar-container {
-      width: 100%;
-      height: 10px;
-      background: #e2e8f0;
+      padding: 9px 18px;
       border-radius: 6px;
-      overflow: hidden;
-      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
-    }
-
-    .progress-bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #4f46e5 0%, #0ea5e9 50%, #10b981 100%);
-      width: 0%;
-      border-radius: 6px;
-      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .quiz-meta {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 18px;
-      padding-bottom: 14px;
-      border-bottom: 1px dashed var(--border);
-    }
-
-    .group-badge {
-      background: var(--primary-light);
-      color: var(--primary);
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 0.82rem;
-      font-weight: 700;
-    }
-
-    .points-badge {
-      background: #fef3c7;
-      color: #b45309;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 0.82rem;
-      font-weight: 700;
-    }
-
-    .btn-bookmark {
-      background: #fef3c7;
-      border: 1.5px solid #fde68a;
-      color: #b45309;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 0.82rem;
-      font-weight: 700;
+      font-weight: 600;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
       transition: all 0.2s ease;
-    }
-
-    .btn-bookmark:hover {
-      background: #fde68a;
-      transform: translateY(-1px);
-    }
-
-    .btn-bookmark.active {
-      background: #f59e0b;
-      color: white;
-      border-color: #d97706;
-      box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
-    }
-
-    .scenario-box {
-      background: #f1f5f9;
-      border-left: 4px solid var(--secondary);
-      border-radius: var(--radius-sm);
-      padding: 16px;
-      margin-bottom: 20px;
-      font-size: 0.92rem;
-      line-height: 1.6;
-      color: #334155;
-    }
-
-    .question-title {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: var(--dark);
-      line-height: 1.55;
-      margin-bottom: 24px;
-    }
-
-    .options-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: auto;
-    }
-
-    .option-item {
-      background: white;
-      border: 2px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 14px 18px;
-      cursor: pointer;
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      transition: all 0.2s ease;
-    }
-
-    .option-item:hover {
-      border-color: #cbd5e1;
-      background: #f8fafc;
-    }
-
-    .option-item.selected {
-      border-color: var(--primary);
-      background: var(--primary-light);
-      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.12);
-    }
-
-    .option-radio {
-      width: 22px;
-      height: 22px;
-      border: 2px solid #94a3b8;
-      border-radius: 50%;
-      margin-top: 2px;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-    }
-
-    .option-item.selected .option-radio {
-      border-color: var(--primary);
-      background: var(--primary);
-    }
-
-    .option-item.selected .option-radio::after {
-      content: "";
-      width: 8px;
-      height: 8px;
-      background: white;
-      border-radius: 50%;
-    }
-
-    .option-radio.checkbox {
-      border-radius: 6px;
-    }
-
-    .option-item.selected .option-radio.checkbox::after {
-      content: "✓";
-      width: 100%;
-      height: 100%;
-      background: transparent;
-      border-radius: 0;
-      color: white;
-      font-size: 0.8rem;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .badge-multi {
-      background: #fef3c7;
-      color: #d97706;
-      border: 1px solid #fde68a;
-    }
-
-    .option-text {
-      font-size: 0.95rem;
-      line-height: 1.55;
-      color: var(--text);
-    }
-
-    .quiz-actions {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-top: 28px;
-      padding-top: 16px;
-      border-top: 1px solid var(--border);
-      flex-wrap: wrap;
-    }
-
-    .btn-nav {
-      padding: 12px 18px;
-      border-radius: var(--radius-md);
-      font-weight: 700;
-      font-size: 0.9rem;
-      cursor: pointer;
-      border: 1px solid var(--border);
-      background: white;
-      color: var(--text);
-      transition: all 0.2s;
       display: inline-flex;
       align-items: center;
       gap: 6px;
     }
 
-    .btn-nav:hover:not(:disabled) {
-      background: var(--light-bg);
-      border-color: #cbd5e1;
-    }
-
-    .btn-nav:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-
-    .btn-jump {
-      background: #eff6ff;
-      border-color: #bfdbfe;
-      color: #1d4ed8;
-    }
-
-    .btn-jump:hover:not(:disabled) {
-      background: #dbeafe;
-    }
-
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-      border: none;
-    }
-
-    .btn-primary:hover:not(:disabled) {
-      background: var(--primary-hover);
-    }
-
-    .btn-submit {
-      background: linear-gradient(135deg, var(--success), #059669);
-      color: white;
-      border: none;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
-    }
-
-    .btn-submit:hover {
-      box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35);
+    .btn-primary:hover {
+      filter: brightness(1.1);
       transform: translateY(-1px);
     }
 
-    /* DASHBOARD PANEL */
-    .dashboard-panel {
-      background: var(--card-bg);
-      backdrop-filter: blur(16px);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 20px;
-      box-shadow: var(--shadow);
-    }
-
-    .dashboard-header {
-      font-size: 1rem;
-      font-weight: 800;
-      color: var(--dark);
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .stat-boxes {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .stat-box {
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 10px 6px;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .stat-num {
-      font-size: 1.15rem;
-      font-weight: 800;
-    }
-
-    .stat-lbl {
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: var(--text-muted);
-    }
-
-    .stat-box.answered .stat-num {
-      color: var(--success);
-    }
-
-    .stat-box.unanswered .stat-num {
-      color: #f59e0b;
-    }
-
-    .stat-box.bookmarked .stat-num {
-      color: #d97706;
-    }
-
-    .group-filter-tabs,
-    .group-filter-subtabs {
-      display: flex;
-      gap: 4px;
-      margin-bottom: 10px;
-      overflow-x: auto;
-      padding-bottom: 4px;
-    }
-
-    .filter-tab,
-    .subtab {
-      padding: 6px 10px;
-      font-size: 0.75rem;
-      font-weight: 700;
+    .btn-secondary {
+      background: #f1f2f6;
+      color: var(--text-dark);
+      border: 1px solid var(--border-color);
+      padding: 9px 16px;
       border-radius: 6px;
-      background: #f1f5f9;
-      color: var(--text-muted);
+      font-weight: 600;
       cursor: pointer;
-      white-space: nowrap;
-      border: none;
       transition: all 0.2s;
     }
 
-    .filter-tab.active,
-    .subtab.active {
-      background: var(--dark);
-      color: white;
+    .btn-secondary:hover {
+      background: #e4e7eb;
     }
 
-    .q-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 8px;
-      max-height: 380px;
-      overflow-y: auto;
-      padding-right: 4px;
-    }
-
-    .q-grid-item {
-      aspect-ratio: 1;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      background: white;
-      font-size: 0.85rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      position: relative;
-      transition: all 0.15s ease;
-    }
-
-    .q-grid-item:hover {
-      border-color: var(--primary);
-      transform: scale(1.05);
-    }
-
-    .q-grid-item.active {
-      border-color: var(--primary);
-      background: #e0e7ff;
-      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.35);
-      color: var(--primary);
-    }
-
-    .q-grid-item.answered {
-      background: #ecfdf5;
-      border-color: #10b981;
-      color: #047857;
-    }
-
-    .q-grid-item.answered.active {
-      background: #d1fae5;
-      border-color: #059669;
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.35);
-    }
-
-    .q-grid-item.bookmarked::after {
-      content: "🚩";
-      position: absolute;
-      top: -4px;
-      right: -2px;
-      font-size: 0.65rem;
-    }
-
-    .btn-submit-early {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
+    .btn-upgrade {
+      background: linear-gradient(135deg, #f39c12, #d35400);
       color: white;
       border: none;
-      padding: 14px;
-      border-radius: var(--radius-md);
-      font-weight: 800;
-      font-size: 0.95rem;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.85em;
       cursor: pointer;
-      box-shadow: var(--shadow-lg);
+      box-shadow: 0 2px 8px rgba(243, 156, 18, 0.4);
+    }
+
+    .btn-upgrade:hover {
+      filter: brightness(1.1);
+    }
+
+    /* ==========================================================================
+       2. TOP HEADER (BRANDING, AUDIO, TIMER, CONTROLS, I18N)
+       ========================================================================== */
+    .app-header {
+      height: var(--header-height);
+      background-color: var(--card-bg);
+      border-bottom: 2px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 100;
+      flex-shrink: 0;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .header-logo {
+      font-weight: 800;
+      font-size: 1.15em;
+      color: var(--primary-blue);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .header-badge {
+      font-size: 0.75em;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge-free {
+      background: #dfe6e9;
+      color: #636e72;
+    }
+
+    .badge-pro {
+      background: #ffeaa7;
+      color: #d63031;
+    }
+
+    .badge-teacher {
+      background: #e3f2fd;
+      color: #1976d2;
+    }
+
+    .badge-ta {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .header-center {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .timer-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 1.15em;
+      background: #eef2f7;
+      padding: 4px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+    }
+
+    .lang-switcher {
+      display: flex;
+      background: #eef2f7;
+      border-radius: 20px;
+      padding: 2px;
+      border: 1px solid var(--border-color);
+    }
+
+    .lang-btn {
+      border: none;
+      background: transparent;
+      padding: 4px 10px;
+      border-radius: 16px;
+      font-size: 0.8em;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .lang-btn.active {
+      background: var(--primary-blue);
+      color: white;
+    }
+
+    /* Part Sub-Header (During Exam) */
+    .part-header {
+      background: #e9edf0;
+      padding: 6px 16px;
+      font-size: 0.9em;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .part-tabs {
+      display: flex;
+      gap: 8px;
+    }
+
+    .part-tab-btn {
+      padding: 5px 14px;
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.85em;
+    }
+
+    .part-tab-btn.active {
+      background: var(--primary-blue);
+      color: white;
+      border-color: var(--primary-blue);
+    }
+
+    /* ==========================================================================
+       3. HIGHLIGHT TOOLBAR & ANNOTATIONS (SMART PALETTE)
+       ========================================================================== */
+    .hl-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: white;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      font-size: 0.85em;
+    }
+
+    .hl-color-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: transform 0.1s;
+    }
+
+    .hl-color-dot:hover,
+    .hl-color-dot.active {
+      transform: scale(1.2);
+      border-color: #2d3436;
+    }
+
+    .dot-yellow {
+      background: #fdcb6e;
+    }
+
+    .dot-green {
+      background: #55efc4;
+    }
+
+    .dot-pink {
+      background: #ff7675;
+    }
+
+    mark.cbt-hl {
+      padding: 2px 0;
+      border-radius: 2px;
+    }
+
+    mark.cbt-hl.yellow {
+      background-color: var(--hl-yellow);
+    }
+
+    mark.cbt-hl.green {
+      background-color: var(--hl-green);
+    }
+
+    mark.cbt-hl.pink {
+      background-color: var(--hl-pink);
+    }
+
+    body.hl-hidden mark.cbt-hl {
+      background-color: transparent !important;
+    }
+
+    /* ==========================================================================
+       4. DASHBOARD & NAVIGATION
+       ========================================================================== */
+    .dashboard-view {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      max-width: 1280px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .welcome-card {
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      color: white;
+      border-radius: 12px;
+      padding: 24px 30px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(30, 60, 114, 0.15);
+    }
+
+    .dash-nav-pills {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+    }
+
+    .dash-nav-btn {
+      padding: 8px 18px;
+      background: transparent;
+      border: none;
+      font-weight: 700;
+      font-size: 0.95em;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .dash-nav-btn.active {
+      background: var(--primary-blue);
+      color: white;
+    }
+
+    .exams-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    .exam-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
       transition: transform 0.2s, box-shadow 0.2s;
     }
 
-    .btn-submit-early:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
+    .exam-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
     }
 
-    /* MODALS */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(15, 23, 42, 0.7);
-      backdrop-filter: blur(6px);
-      z-index: 999;
-      display: none;
+    .skill-badge {
+      font-size: 0.75em;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .skill-badge.reading {
+      background: #e3f2fd;
+      color: #1976d2;
+    }
+
+    .skill-badge.listening {
+      background: #f3e5f5;
+      color: #7b1fa2;
+    }
+
+    .skill-badge.writing {
+      background: #fff3e0;
+      color: #e65100;
+    }
+
+    .skill-badge.grammar,
+    .skill-badge.vocab {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    /* ==========================================================================
+       5. CBT EXAM RUNNER VIEWPORTS (READING / LISTENING / WRITING)
+       ========================================================================== */
+    .main-viewport {
+      flex: 1;
+      display: flex;
+      height: calc(100vh - var(--header-height) - var(--footer-height) - 37px);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .reading-panel {
+      flex: 1;
+      overflow-y: auto;
+      padding: 30px 40px;
+      font-family: var(--font-passage);
+      font-size: 1.05em;
+      line-height: 1.85;
+      background: var(--card-bg);
+    }
+
+    .reading-panel p {
+      margin-bottom: 20px;
+    }
+
+    .questions-panel {
+      flex: 1;
+      overflow-y: auto;
+      padding: 30px 40px;
+      background: #fafbfc;
+      border-left: 1px solid var(--border-color);
+      font-family: var(--font-ui);
+      font-size: 0.95em;
+      line-height: 1.7;
+    }
+
+    .resizer {
+      width: 8px;
+      background: var(--border-color);
+      cursor: col-resize;
+      transition: background 0.2s;
+    }
+
+    .resizer:hover,
+    .resizer.dragging {
+      background: var(--accent-blue);
+    }
+
+    /* In-situ Input Fields */
+    .answer-input {
+      display: inline-block;
+      padding: 4px 10px;
+      font-weight: 700;
+      color: var(--primary-blue);
+      border: 1.5px solid #b2bec3;
+      border-radius: 4px;
+      background: white;
+      margin: 0 4px;
+      min-width: 90px;
+      text-align: center;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .answer-input:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 2px rgba(9, 132, 227, 0.2);
+    }
+
+    .answer-input.correct {
+      border-color: var(--success-green);
+      background: #e8f8f5;
+      color: var(--success-green);
+    }
+
+    .answer-input.incorrect {
+      border-color: var(--danger-red);
+      background: #fdf2f2;
+      color: var(--danger-red);
+    }
+
+    /* Writing Essay Textarea */
+    .essay-textarea {
+      width: 100%;
+      height: 100%;
+      border: none;
+      padding: 24px;
+      font-size: 1.05em;
+      line-height: 1.8;
+      resize: none;
+      outline: none;
+      background: white;
+      font-family: var(--font-ui);
+    }
+
+    /* ==========================================================================
+       6. CBT BOTTOM FOOTER (NAVIGATION CHIPS & SUBMIT)
+       ========================================================================== */
+    .app-footer {
+      height: var(--footer-height);
+      background: var(--card-bg);
+      border-top: 2px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      flex-shrink: 0;
+    }
+
+    .q-chips-container {
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+      max-width: 80%;
+      padding: 4px 0;
+    }
+
+    .q-chip {
+      width: 32px;
+      height: 32px;
+      border-radius: 4px;
+      border: 1px solid #b2bec3;
+      display: flex;
       align-items: center;
       justify-content: center;
-      padding: 16px;
+      font-size: 0.8em;
+      font-weight: 700;
+      background: white;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.15s;
     }
 
-    .modal-overlay.active {
+    .q-chip.answered {
+      background: var(--cbt-yellow);
+      border-color: #e1b12c;
+      color: #2d3436;
+    }
+
+    .q-chip.correct {
+      background: var(--success-green);
+      color: white;
+      border-color: var(--success-green);
+    }
+
+    .q-chip.incorrect {
+      background: var(--danger-red);
+      color: white;
+      border-color: var(--danger-red);
+    }
+
+    /* ==========================================================================
+       7. LEADERBOARD (HALL OF FAME TOP 10 / 100)
+       ========================================================================== */
+    .leaderboard-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .leaderboard-table th,
+    .leaderboard-table td {
+      padding: 14px 18px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .leaderboard-table th {
+      background: #f8f9fa;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .rank-badge {
+      display: inline-flex;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.85em;
+    }
+
+    .rank-1 {
+      background: #f1c40f;
+      color: white;
+    }
+
+    .rank-2 {
+      background: #bdc3c7;
+      color: white;
+    }
+
+    .rank-3 {
+      background: #e67e22;
+      color: white;
+    }
+
+    /* ==========================================================================
+       8. MODALS & POPUPS (AUTH, UPGRADE, RESULTS, WORKSPACE)
+       ========================================================================== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 1000;
       display: flex;
-      animation: fadeIn 0.2s ease-out;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
 
     .modal-card {
       background: white;
-      border-radius: var(--radius-lg);
-      max-width: 520px;
+      border-radius: 12px;
       width: 100%;
-      padding: 28px;
-      text-align: center;
-      box-shadow: var(--shadow-lg);
+      max-width: 540px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      max-height: 90vh;
+      overflow-y: auto;
     }
 
-    .modal-icon {
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 16px;
-      font-size: 2rem;
+    .form-group {
+      margin-bottom: 16px;
     }
 
-    .modal-icon.warning {
-      background: #fef2f2;
-      color: #dc2626;
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 0.9em;
     }
 
-    .modal-icon.info {
-      background: #eff6ff;
-      color: #2563eb;
-    }
-
-    .modal-icon.success {
-      background: #ecfdf5;
-      color: #10b981;
-    }
-
-    .modal-title {
-      font-size: 1.3rem;
-      font-weight: 800;
-      color: var(--dark);
-      margin-bottom: 12px;
-    }
-
-    .modal-text {
-      font-size: 0.92rem;
-      color: var(--text-muted);
-      line-height: 1.55;
-      margin-bottom: 20px;
-    }
-
-    .submit-summary-box {
-      background: #f8fafc;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 16px;
-      margin-bottom: 24px;
-      text-align: left;
-      font-size: 0.9rem;
-    }
-
-    .submit-modal-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .btn-modal {
+    .form-control {
       width: 100%;
-      padding: 14px;
-      border-radius: var(--radius-md);
-      font-weight: 700;
-      font-size: 0.9rem;
-      cursor: pointer;
-      border: none;
-      transition: all 0.2s;
+      padding: 10px 14px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 0.95em;
+      outline: none;
     }
 
-    .btn-modal-primary {
-      background: linear-gradient(135deg, var(--success), #059669);
-      color: white;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+    .form-control:focus {
+      border-color: var(--accent-blue);
     }
 
-    .btn-modal-secondary {
-      background: #f1f5f9;
-      color: var(--dark);
-      border: 1px solid var(--border);
-    }
-
-    .btn-modal-secondary:hover {
-      background: #e2e8f0;
-    }
-
-    /* FINAL PRIVACY THANK YOU SCREEN */
-    .final-card {
-      background: var(--card-bg);
-      backdrop-filter: blur(16px);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 40px 30px;
-      text-align: center;
-      box-shadow: var(--shadow-lg);
-      max-width: 640px;
-      margin: 40px auto;
-    }
-
-    .final-icon {
-      width: 80px;
-      height: 80px;
-      background: #ecfdf5;
-      color: #10b981;
-      border-radius: 50%;
+    /* Explanation Drawer */
+    .explanation-drawer {
+      position: fixed;
+      top: var(--header-height);
+      right: 0;
+      bottom: var(--footer-height);
+      width: 480px;
+      background: white;
+      border-left: 2px solid var(--border-color);
+      box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
+      z-index: 90;
       display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease;
+    }
+
+    .explanation-drawer.collapsed {
+      transform: translateX(100%);
+    }
+
+    .drawer-header {
+      padding: 14px 20px;
+      background: #f8f9fa;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
       align-items: center;
-      justify-content: center;
-      font-size: 2.5rem;
-      margin: 0 auto 20px;
     }
 
-    .final-title {
-      font-size: 1.6rem;
-      font-weight: 800;
-      color: var(--dark);
-      margin-bottom: 12px;
-    }
-
-    .final-msg {
-      font-size: 0.95rem;
-      color: var(--text-muted);
-      line-height: 1.6;
-      margin-bottom: 24px;
-    }
-
-    /* RESPONSIVE DESIGN FOR MOBILE & TABLET */
-    @media (max-width: 900px) {
-      .quiz-layout {
-        grid-template-columns: 1fr;
-      }
-
-      .btn-toggle-nav {
-        display: block;
-      }
-
-      .dashboard-panel {
-        position: fixed;
-        top: 0;
-        right: -100%;
-        bottom: 0;
-        width: 320px;
-        z-index: 200;
-        transition: right 0.3s ease;
-        border-radius: 0;
-        box-shadow: -10px 0 25px rgba(0, 0, 0, 0.15);
-      }
-
-      .dashboard-panel.open {
-        right: 0;
-      }
-
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .form-group.full-width {
-        grid-column: span 1;
-      }
-
-      header {
-        padding: 10px 14px;
-      }
-
-      .brand-title {
-        font-size: 0.95rem;
-      }
-
-      .question-card {
-        padding: 20px;
-        min-height: auto;
-      }
+    .drawer-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      line-height: 1.7;
+      font-size: 0.9em;
     }
   </style>
 </head>
 
 <body>
 
-  <div class="app-container">
-    <!-- HEADER -->
-    <header>
-      <div class="brand">
-        <div class="brand-logo">2G</div>
-        <div>
-          <div class="brand-title">2G Education</div>
-          <div class="brand-sub">Khảo sát Đánh giá Kiến thức</div>
+  <!-- ========================================================================
+       TOP HEADER
+       ======================================================================== -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="header-logo" onclick="switchView('dashboard')">
+        <span>📘</span>
+        <span id="txt-brand">IELTS Master CBT</span>
+      </div>
+      <span id="user-tier-badge" class="header-badge badge-free">FREE</span>
+      <span id="user-display-name" style="font-size:0.85em; font-weight:600; color:var(--text-muted);">Guest</span>
+    </div>
+
+    <div class="header-center">
+      <div id="audio-player-wrapper" class="hidden">
+        <audio id="exam-audio-element" controls style="height:36px;">
+          <source src="" type="audio/mpeg">
+        </audio>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <div class="timer-container hidden" id="exam-timer-box">
+        <span>⏱️</span>
+        <span id="exam-timer-text">60:00</span>
+      </div>
+
+      <!-- Reading Smart Highlight Tools -->
+      <div class="hl-toolbar hidden" id="reading-hl-toolbar">
+        <span style="font-weight:600;" id="txt-hl-label">Highlight:</span>
+        <div class="hl-color-dot dot-yellow active" onclick="setHighlightColor('yellow', this)" title="Yellow"></div>
+        <div class="hl-color-dot dot-green" onclick="setHighlightColor('green', this)" title="Green"></div>
+        <div class="hl-color-dot dot-pink" onclick="setHighlightColor('pink', this)" title="Pink"></div>
+        <button class="btn-secondary" style="padding:3px 8px; font-size:0.8em;" onclick="toggleHighlights()"
+          id="btn-toggle-hl">👁️ Hide</button>
+        <button class="btn-secondary" style="padding:3px 8px; font-size:0.8em;" onclick="clearAllHighlights()"
+          id="btn-clear-hl">🗑️ Clear</button>
+      </div>
+
+      <button class="btn-upgrade" onclick="openUpgradeModal()" id="btn-upgrade-nav">⭐ Upgrade Pro</button>
+
+      <!-- Language Switcher EN / VI -->
+      <div class="lang-switcher">
+        <button class="lang-btn active" id="lang-en" onclick="setLanguage('en')">EN</button>
+        <button class="lang-btn" id="lang-vi" onclick="setLanguage('vi')">VI</button>
+      </div>
+
+      <button class="btn-secondary" id="btn-auth-action" onclick="handleAuthButtonClick()">Login</button>
+    </div>
+  </header>
+
+  <!-- Part Sub-Header (Shown only during exam) -->
+  <div class="part-header hidden" id="part-sub-header">
+    <div class="part-tabs" id="part-tabs-container"></div>
+    <div id="part-timer-info" style="color:var(--text-muted); font-size:0.85em;">Click on questions to jump</div>
+  </div>
+
+  <!-- ========================================================================
+       VIEW 1: DASHBOARD & WORKSPACE
+       ======================================================================== -->
+  <main class="dashboard-view" id="view-dashboard">
+    <!-- Welcome Banner -->
+    <div class="welcome-card">
+      <div>
+        <h2 id="dash-greeting">Welcome back to IELTS CBT!</h2>
+        <p style="opacity:0.9; margin-top:4px;" id="dash-subtitle">Sharpen your skills with authentic computer-based
+          tests.</p>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button class="btn-secondary" style="background:white; color:#1e3c72;" onclick="startRandomTest('reading')">🎲
+          Random Full Test</button>
+        <button class="btn-secondary" style="background:rgba(255,255,255,0.2); color:white; border-color:transparent;"
+          onclick="loadDashboardData()">🔄 Refresh</button>
+      </div>
+    </div>
+
+    <!-- Navigation Pills -->
+    <div class="dash-nav-pills">
+      <button class="dash-nav-btn active" onclick="switchDashTab('exams', this)" id="tab-btn-exams">📚 Exam
+        Bank</button>
+      <button class="dash-nav-btn" onclick="switchDashTab('leaderboard', this)" id="tab-btn-rank">🏆
+        Leaderboard</button>
+      <button class="dash-nav-btn" onclick="switchDashTab('blog', this)" id="tab-btn-blog">💡 Tips & Blog</button>
+      <button class="dash-nav-btn hidden" id="tab-btn-teacher" onclick="switchDashTab('teacher', this)">👩‍🏫 Teacher
+        Workspace</button>
+    </div>
+
+    <!-- Tab 1: Exam Bank Grid -->
+    <div id="dash-tab-exams">
+      <div style="display:flex; gap:10px; margin-bottom:16px;">
+        <button class="skill-pill active btn-secondary" onclick="filterExams('all', this)">All Skills</button>
+        <button class="skill-pill btn-secondary" onclick="filterExams('reading', this)">Reading</button>
+        <button class="skill-pill btn-secondary" onclick="filterExams('listening', this)">Listening</button>
+        <button class="skill-pill btn-secondary" onclick="filterExams('writing', this)">Writing</button>
+        <button class="skill-pill btn-secondary" onclick="filterExams('grammar', this)">Grammar & Vocab</button>
+      </div>
+      <div class="exams-grid" id="exams-grid-container">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- Tab 2: Leaderboard (Hall of Fame) -->
+    <div id="dash-tab-leaderboard" class="hidden">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h3 id="txt-leaderboard-title">Top IELTS Performers (Top 100)</h3>
+        <div style="display:flex; gap:8px;">
+          <button class="btn-secondary" onclick="loadLeaderboard('score')">Top Band Score</button>
+          <button class="btn-secondary" onclick="loadLeaderboard('tests')">Most Tests Done</button>
         </div>
       </div>
-      <div class="header-widgets">
-        <div class="timer-badge" id="timerDisplay">⏱️ 75:00</div>
-        <div class="user-badge" id="userBadge">Nhân viên</div>
-        <button class="btn-toggle-nav" id="btnToggleNav">📋 Danh sách câu (87)</button>
+      <table class="leaderboard-table">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Candidate</th>
+            <th>Tier</th>
+            <th>Tests Completed</th>
+            <th>Avg. Band</th>
+            <th>Study Streak</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboard-tbody">
+          <!-- Rendered dynamically -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Tab 3: Blog Posts -->
+    <div id="dash-tab-blog" class="hidden">
+      <div class="exams-grid" id="blog-posts-grid"></div>
+    </div>
+
+    <!-- Tab 4: Teacher Workspace -->
+    <div id="dash-tab-teacher" class="hidden">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h3>My Managed Classes</h3>
+        <button class="btn-primary" onclick="openCreateClassModal()">+ Create New Class</button>
       </div>
-    </header>
+      <div class="exams-grid" id="teacher-classes-grid"></div>
+    </div>
+  </main>
 
-    <!-- WELCOME / REGISTRATION SCREEN -->
-    <div class="screen active" id="welcomeScreen">
-      <div class="welcome-card">
-        <h1 class="welcome-title">KHẢO SÁT CHUYÊN MÔN & KĨ NĂNG</h1>
-        <p class="welcome-subtitle">Chương trình đào tạo và nâng cao năng lực đội ngũ 2G Education</p>
+  <!-- ========================================================================
+       VIEW 2: CBT EXAM RUNNER (READING / LISTENING / WRITING)
+       ======================================================================== -->
+  <main class="main-viewport hidden" id="view-exam-runner">
+    <!-- Split Screen: Left Passage / Prompt -->
+    <section class="reading-panel" id="exam-left-panel">
+      <!-- Injected passage HTML -->
+    </section>
 
-        <div class="notes-box">
-          <h4>📌 Hướng dẫn & Lưu ý trước khi bắt đầu:</h4>
-          <ul class="notes-list">
-            <li><strong>Mục đích:</strong> Khảo sát KHÔNG ảnh hưởng đến đánh giá của công ty đối với bạn. Mục đích là
-              giúp xác định điểm gap kiến thức để lên kế hoạch đào tạo phù hợp.</li>
-            <li><strong>Trọng số chính:</strong> Nội dung tập trung chủ yếu vào kiến thức gắn liền với các chương trình
-              IELTS (Nhóm A).</li>
-            <li><strong>Cấu trúc bài test (87 câu - 107 điểm):</strong>
-              <br>• <strong>Nhóm A (1 điểm/câu):</strong> A1 (15 câu chương trình học) & A2 (52 câu Cẩm nang IELTS 360).
-              <br>• <strong>Nhóm B (2 điểm/câu):</strong> B1 (10 câu Suy luận Logic) & B2 (10 câu Điều khoản Hợp đồng
-              tiêu chuẩn).
-            </li>
-            <li><strong>Quy định chống gian lận:</strong> Không chuyển tab hay mở cửa sổ khác. Chuyển tab quá <strong>5
-                lần</strong> sẽ bị <strong>RESET toàn bộ đáp án đã nhập</strong> (thời gian vẫn tiếp tục chạy).</li>
+    <div class="resizer" id="drag-resizer"></div>
+
+    <!-- Split Screen: Right Questions / Essay Editor -->
+    <section class="questions-panel" id="exam-right-panel">
+      <!-- Injected questions HTML or Essay Textarea -->
+    </section>
+  </main>
+
+  <!-- ========================================================================
+       BOTTOM FOOTER (CBT EXAM CONTROLS)
+       ======================================================================== -->
+  <footer class="app-footer hidden" id="app-footer">
+    <div class="q-chips-container" id="footer-q-chips"></div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn-secondary" onclick="confirmExitExam()" id="btn-exit-exam">Exit Test</button>
+      <button class="btn-primary" onclick="confirmSubmitExam()" id="btn-submit-exam">Submit (Nộp bài) ▶</button>
+    </div>
+  </footer>
+
+  <!-- ========================================================================
+       SIDE DRAWER: EXPLANATION & VOCABULARY
+       ======================================================================== -->
+  <aside class="explanation-drawer collapsed" id="explanation-drawer">
+    <div class="drawer-header">
+      <h3 style="font-size:1.05em; color:var(--primary-blue);" id="txt-drawer-title">📖 Detailed Answer Keys &
+        Vocabulary</h3>
+      <button class="btn-secondary" style="padding:4px 8px;" onclick="toggleExplanationDrawer()">✕</button>
+    </div>
+    <div class="drawer-body" id="explanation-content-body"></div>
+  </aside>
+
+  <!-- ========================================================================
+       MODAL 1: AUTHENTICATION (EMAIL & GOOGLE OAUTH)
+       ======================================================================== -->
+  <div class="modal-overlay hidden" id="modal-auth">
+    <div class="modal-card">
+      <h2 style="margin-bottom:8px;" id="auth-modal-title">Sign In to IELTS CBT</h2>
+      <p style="color:var(--text-muted); font-size:0.9em; margin-bottom:20px;" id="auth-modal-subtitle">Access your
+        tests, track progress and view answer explanations.</p>
+
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="auth-input-email" class="form-control" placeholder="name@example.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="auth-input-password" class="form-control" placeholder="••••••••">
+      </div>
+      <div class="form-group hidden" id="auth-group-fullname">
+        <label>Full Name</label>
+        <input type="text" id="auth-input-fullname" class="form-control" placeholder="Trần Văn A">
+      </div>
+
+      <div id="auth-error-msg" style="color:var(--danger-red); font-size:0.85em; margin-bottom:12px;" class="hidden">
+      </div>
+
+      <button class="btn-primary" style="width:100%; justify-content:center; padding:12px;" id="btn-auth-submit"
+        onclick="executeAuth()">Sign In</button>
+
+      <div style="text-align:center; margin:16px 0; color:var(--text-muted); font-size:0.85em;">OR</div>
+
+      <button class="btn-secondary" style="width:100%; justify-content:center; padding:11px;"
+        onclick="signInWithGoogle()">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width:18px; height:18px;">
+        Sign in with Google
+      </button>
+
+      <div style="text-align:center; margin-top:20px; font-size:0.9em;">
+        <span id="auth-switch-prompt">Don't have an account?</span>
+        <a href="javascript:void(0)" onclick="toggleAuthMode()" style="color:var(--accent-blue); font-weight:700;"
+          id="auth-switch-btn">Sign Up</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 2: UPGRADE PRO & MOMO QR PAYMENT
+       ======================================================================== -->
+  <div class="modal-overlay hidden" id="modal-upgrade">
+    <div class="modal-card" style="max-width:620px;">
+      <h2 style="color:var(--primary-blue); margin-bottom:6px;">🚀 Upgrade Your Membership</h2>
+      <p style="color:var(--text-muted); font-size:0.9em; margin-bottom:20px;">Unlock full exam bank, instant
+        auto-grading, and teacher management tools.</p>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;">
+        <!-- Plan 1: Student -->
+        <div class="exam-card" style="border:2px solid var(--accent-blue); cursor:pointer;"
+          onclick="selectPaymentPlan('student_pro', 150000)">
+          <span class="skill-badge reading">Student Pro</span>
+          <h3 style="margin:10px 0 6px;">150,000đ <small
+              style="font-size:0.7em; color:var(--text-muted);">/month</small></h3>
+          <ul style="font-size:0.85em; color:var(--text-muted); padding-left:18px; line-height:1.6;">
+            <li>Unlimited Full CBT Tests</li>
+            <li>Detailed Vocab & Explanations</li>
+            <li>Auto-save & Highlight persistence</li>
           </ul>
         </div>
 
-        <form id="registrationForm">
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="fullName">Họ và tên nhân viên *</label>
-              <input type="text" id="fullName" required placeholder="Nhập đầy đủ họ và tên">
-            </div>
-
-            <div class="form-group">
-              <label for="deptSelect">Bộ phận làm việc *</label>
-              <select id="deptSelect" required>
-                <option value="">-- Chọn bộ phận --</option>
-                <option value="LPA">LPA (Learning Program Advisor)</option>
-                <option value="HLC">HLC (Holistic Learning Coordinator)</option>
-                <option value="CUSTOM">Khác (Tự nhập...)</option>
-              </select>
-            </div>
-
-            <div class="form-group full-width" id="customDeptGroup" style="display: none;">
-              <label for="customDept">Tên bộ phận khác *</label>
-              <input type="text" id="customDept" placeholder="Nhập tên bộ phận của bạn">
-            </div>
-
-            <div class="form-group">
-              <label for="seniority">Thâm niên làm việc *</label>
-              <select id="seniority" required>
-                <option value="">-- Chọn thâm niên --</option>
-                <option value="Dưới 6 tháng">Dưới 6 tháng</option>
-                <option value="6 tháng - 1 năm">6 tháng - 1 năm</option>
-                <option value="1 - 2 năm">1 - 2 năm</option>
-                <option value="Trên 2 năm">Trên 2 năm</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="birthYear">Năm sinh *</label>
-              <input type="number" id="birthYear" min="1970" max="2008" required placeholder="Ví dụ: 1998">
-            </div>
-          </div>
-
-          <button type="submit" class="btn-start">BẮT ĐẦU KHẢO SÁT (1H 15 PHÚT)</button>
-        </form>
-      </div>
-    </div>
-
-    <!-- QUIZ MAIN SCREEN -->
-    <div class="screen" id="quizScreen">
-      <div class="quiz-layout">
-        <!-- MAIN QUESTION CARD -->
-        <div class="question-card">
-          <div class="progress-header">
-            <div class="progress-info">
-              <span class="progress-title">⚡️ Tiến độ khảo sát</span>
-              <span class="progress-status-badge" id="progressPercentBadge">0% (0/87 câu)</span>
-            </div>
-            <div class="progress-bar-container">
-              <div class="progress-bar-fill" id="progressBarFill"></div>
-            </div>
-          </div>
-
-          <div class="quiz-meta">
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span class="group-badge" id="groupBadge">Nhóm A1</span>
-              <span class="points-badge" id="pointsBadge">1 Điểm</span>
-            </div>
-            <button class="btn-bookmark" id="btnBookmark" title="Đánh dấu câu hỏi này để xem lại (Phím F)">
-              <span id="bookmarkIcon">🚩</span> <span id="bookmarkText">Đánh dấu</span>
-            </button>
-          </div>
-
-          <div class="scenario-box" id="scenarioBox" style="display: none;">
-            <strong>Tình huống:</strong> <span id="scenarioText"></span>
-          </div>
-
-          <div class="question-title" id="questionTitle">
-            Loading question...
-          </div>
-
-          <div class="options-list" id="optionsList">
-            <!-- Rendered by JS -->
-          </div>
-
-          <div class="quiz-actions">
-            <button class="btn-nav" id="btnPrev" disabled>← Trước (←)</button>
-            <button class="btn-nav btn-jump" id="btnJumpUnanswered"
-              title="Chuyển đến câu chưa trả lời tiếp theo (Phím U)">⚡️ Chưa làm</button>
-            <span style="font-size:0.85rem; font-weight:700; color:var(--dark);" id="qProgressText">Câu 1 / 87</span>
-            <button class="btn-nav btn-primary" id="btnNext">Tiếp (→)</button>
-          </div>
-        </div>
-
-        <!-- SIDEBAR DASHBOARD -->
-        <div class="dashboard-panel" id="dashboardPanel">
-          <div class="dashboard-header">
-            <span>Bảng theo dõi câu hỏi</span>
-          </div>
-
-          <div class="stat-boxes">
-            <div class="stat-box answered">
-              <span class="stat-num" id="statAnsweredCount">0</span>
-              <span class="stat-lbl">Đã làm</span>
-            </div>
-            <div class="stat-box unanswered">
-              <span class="stat-num" id="statUnansweredCount">87</span>
-              <span class="stat-lbl">Chưa làm</span>
-            </div>
-            <div class="stat-box bookmarked">
-              <span class="stat-num" id="statBookmarkedCount">0</span>
-              <span class="stat-lbl">Xem lại 🚩</span>
-            </div>
-          </div>
-
-          <div class="group-filter-tabs">
-            <button class="filter-tab active" data-filter="ALL">Tất cả</button>
-            <button class="filter-tab" data-filter="ANSWERED">Đã làm</button>
-            <button class="filter-tab" data-filter="UNANSWERED">Chưa làm</button>
-            <button class="filter-tab" data-filter="FLAGGED">🚩 Xem lại</button>
-          </div>
-
-          <div class="group-filter-subtabs">
-            <button class="subtab active" data-group="ALL">Tất cả nhóm</button>
-            <button class="subtab" data-group="A1">A1</button>
-            <button class="subtab" data-group="A2">A2</button>
-            <button class="subtab" data-group="B1">B1</button>
-            <button class="subtab" data-group="B2">B2</button>
-          </div>
-
-          <div class="q-grid" id="qGrid">
-            <!-- 87 Grid items rendered by JS -->
-          </div>
-
-          <button class="btn-submit-early" id="btnSubmitEarly" style="width:100%; margin-top:16px;">
-            🚀 NỘP BÀI KHẢO SÁT
-          </button>
+        <!-- Plan 2: Teacher -->
+        <div class="exam-card" style="border:2px solid #e67e22; cursor:pointer;"
+          onclick="selectPaymentPlan('teacher_base', 250000)">
+          <span class="skill-badge writing">Teacher Base</span>
+          <h3 style="margin:10px 0 6px;">250,000đ <small
+              style="font-size:0.7em; color:var(--text-muted);">/month</small></h3>
+          <ul style="font-size:0.85em; color:var(--text-muted); padding-left:18px; line-height:1.6;">
+            <li>Manage up to 3 Classes</li>
+            <li>Assign Tests with Deadlines</li>
+            <li>All Student Pro features included</li>
+          </ul>
         </div>
       </div>
-    </div>
 
-    <!-- FINAL PRIVACY SCREEN -->
-    <div class="screen" id="finalScreen">
-      <div class="final-card">
-        <div class="final-icon">✓</div>
-        <h2 class="final-title">HOÀN THÀNH KHẢO SÁT</h2>
-        <p class="final-msg" id="finalMsgText">
-          Cảm ơn bạn đã hoàn thành bài khảo sát. Kết quả bài làm của bạn đã được ghi nhận thành công trên hệ thống 2G
-          Education!
+      <!-- MoMo QR Code Display Area -->
+      <div id="payment-qr-area" class="hidden"
+        style="background:#f8f9fa; border-radius:8px; padding:20px; text-align:center;">
+        <h4 style="margin-bottom:8px;">Scan MoMo / VietQR to Pay</h4>
+        <div style="margin:12px 0;">
+          <img id="payment-qr-image" src=""
+            style="width:200px; height:200px; border-radius:8px; border:1px solid var(--border-color);">
+        </div>
+        <p style="font-size:0.9em; font-weight:700; color:var(--primary-blue);" id="payment-order-desc">Order: IELTS_PRO
         </p>
+        <p style="font-size:0.8em; color:var(--text-muted); margin-top:4px;">⏱️ Account will activate automatically
+          within 3 seconds after payment.</p>
+      </div>
+
+      <div style="text-align:right; margin-top:20px;">
+        <button class="btn-secondary" onclick="closeUpgradeModal()">Close</button>
       </div>
     </div>
   </div>
 
-  <!-- SUBMISSION CONFIRMATION MODAL -->
-  <div class="modal-overlay" id="submitModal">
-    <div class="modal-card">
-      <div class="modal-icon" id="submitModalIcon">📋</div>
-      <h3 class="modal-title" id="submitModalTitle">XÁC NHẬN NỘP BÀI KHẢO SÁT</h3>
-      <div class="submit-summary-box" id="submitSummaryBox">
-        <!-- JS rendered content -->
+  <!-- ========================================================================
+       MODAL 3: RESULTS POPUP
+       ======================================================================== -->
+  <div class="modal-overlay hidden" id="modal-results">
+    <div class="modal-card" style="text-align:center;">
+      <h2 style="font-size:1.8em; color:var(--primary-blue); margin-bottom:8px;">🎉 Test Completed!</h2>
+      <div style="font-size:3em; font-weight:800; color:var(--success-green); margin:10px 0;" id="res-band-score">8.0
       </div>
-      <div class="submit-modal-actions">
-        <button class="btn-modal btn-modal-secondary" id="btnModalContinue">← Tiếp tục làm bài</button>
-        <button class="btn-modal btn-modal-primary" id="btnModalSubmitConfirm">🚀 Nộp bài ngay</button>
+      <p style="font-size:1.1em; font-weight:700;" id="res-score-summary">Score: 35 / 40</p>
+      <div
+        style="display:flex; justify-content:center; gap:20px; margin:20px 0; font-size:0.9em; color:var(--text-muted);">
+        <div>Time: <strong id="res-time-spent">45 mins</strong></div>
+        <div>Tab Switches: <strong id="res-tab-switches" style="color:var(--danger-red);">0</strong></div>
+      </div>
+      <div style="display:flex; gap:12px;">
+        <button class="btn-primary" style="flex:1;" onclick="openReviewMode()">📖 Review Answers</button>
+        <button class="btn-secondary" style="flex:1;"
+          onclick="switchView('dashboard'); closeModal('modal-results');">Dashboard</button>
       </div>
     </div>
   </div>
 
-  <!-- WARNING MODAL FOR TAB SWITCH -->
-  <div class="modal-overlay" id="warningModal">
-    <div class="modal-card">
-      <div class="modal-icon warning">⚠️</div>
-      <h3 class="modal-title" id="warningTitle">CẢNH BÁO VI PHẠM</h3>
-      <p class="modal-text" id="warningText">
-        Bạn vừa chuyển tab hoặc rời khỏi màn hình bài khảo sát!
-      </p>
-      <button class="btn-modal btn-modal-secondary" id="btnCloseModal">Tôi đã hiểu & Tiếp tục làm bài</button>
-    </div>
-  </div>
-
+  <!-- ========================================================================
+       JAVASCRIPT APPLICATION ENGINE (SUPABASE + I18N + HIGHLIGHTS)
+       ======================================================================== -->
   <script>
-    // GOOGLE APPS SCRIPT WEB APP URL (Dán URL sau khi deploy ở bước 4)
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzcJZv5GZhI1SRW_OYnlwXqG6on-l2WVJfoGScNSNhEjNLkvaWwVFptZsZ79IwEDgVnxA/exec";
+    // ==========================================================================
+    // 1. SUPABASE CLIENT CONFIGURATION
+    // ==========================================================================
+    const SUPABASE_URL = "https://zgponymobcwsrasdladf.supabase.co/rest/v1/";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpncG9ueW1vYmN3c3Jhc2RsYWRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4NDEzNjUsImV4cCI6MjEwMjQxNzM2NX0.2Ofj-C9ODsX1BMUKjKkmNcK1OatCANvRurVkBudrrWs";
 
-    // 87 CÂU HỎI DATABASE TỰ ĐỘNG
-    let RAW_QUESTIONS = [];
-
-    // STATE VARIABLES
-    let allQuestions = [];
-    let currentIndex = 0;
-    let userAnswers = {};
-    let employeeInfo = {};
-    let tabSwitchCount = 0;
-    let timerSeconds = 75 * 60; // 1h15m
-    let timerInterval = null;
-    let lastBlurTime = 0;
-
-    // DOM ELEMENTS
-    const welcomeScreen = document.getElementById('welcomeScreen');
-    const quizScreen = document.getElementById('quizScreen');
-    const finalScreen = document.getElementById('finalScreen');
-    const registrationForm = document.getElementById('registrationForm');
-    const deptSelect = document.getElementById('deptSelect');
-    const customDeptGroup = document.getElementById('customDeptGroup');
-    const customDept = document.getElementById('customDept');
-    const timerDisplay = document.getElementById('timerDisplay');
-    const userBadge = document.getElementById('userBadge');
-    const btnToggleNav = document.getElementById('btnToggleNav');
-    const dashboardPanel = document.getElementById('dashboardPanel');
-
-    const progressPercentBadge = document.getElementById('progressPercentBadge');
-    const progressBarFill = document.getElementById('progressBarFill');
-    const groupBadge = document.getElementById('groupBadge');
-    const pointsBadge = document.getElementById('pointsBadge');
-    const btnBookmark = document.getElementById('btnBookmark');
-    const bookmarkIcon = document.getElementById('bookmarkIcon');
-    const bookmarkText = document.getElementById('bookmarkText');
-    const scenarioBox = document.getElementById('scenarioBox');
-    const scenarioText = document.getElementById('scenarioText');
-    const questionTitle = document.getElementById('questionTitle');
-    const optionsList = document.getElementById('optionsList');
-    const btnPrev = document.getElementById('btnPrev');
-    const btnJumpUnanswered = document.getElementById('btnJumpUnanswered');
-    const btnNext = document.getElementById('btnNext');
-    const qProgressText = document.getElementById('qProgressText');
-
-    const statAnsweredCount = document.getElementById('statAnsweredCount');
-    const statUnansweredCount = document.getElementById('statUnansweredCount');
-    const statBookmarkedCount = document.getElementById('statBookmarkedCount');
-    const qGrid = document.getElementById('qGrid');
-    const btnSubmitEarly = document.getElementById('btnSubmitEarly');
-
-    const submitModal = document.getElementById('submitModal');
-    const submitModalIcon = document.getElementById('submitModalIcon');
-    const submitModalTitle = document.getElementById('submitModalTitle');
-    const submitSummaryBox = document.getElementById('submitSummaryBox');
-    const btnModalContinue = document.getElementById('btnModalContinue');
-    const btnModalSubmitConfirm = document.getElementById('btnModalSubmitConfirm');
-
-    const warningModal = document.getElementById('warningModal');
-    const warningTitle = document.getElementById('warningTitle');
-    const warningText = document.getElementById('warningText');
-    const btnCloseModal = document.getElementById('btnCloseModal');
-
-    // STATE VARIABLES
-    let bookmarkedQuestions = new Set();
-    let currentFilterStatus = 'ALL';
-    let currentFilterGroup = 'ALL';
-
-    // FETCH QUESTIONS FROM GAS OR FALLBACK TO LOCAL JSON
-    window.addEventListener('DOMContentLoaded', () => {
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run
-          .withSuccessHandler(data => {
-            if (data && data.length > 0) {
-              RAW_QUESTIONS = data;
-            } else {
-              loadLocalQuestions();
-            }
-          })
-          .withFailureHandler(() => loadLocalQuestions())
-          .getQuestionsData();
-      } else if (GAS_API_URL && GAS_API_URL.trim() !== '') {
-        fetch(GAS_API_URL + '?action=getQuestions')
-          .then(res => res.json())
-          .then(data => {
-            if (data.status === 'success' && data.questions && data.questions.length > 0) {
-              RAW_QUESTIONS = data.questions;
-            } else {
-              loadLocalQuestions();
-            }
-          })
-          .catch(() => loadLocalQuestions());
-      } else {
-        loadLocalQuestions();
+    // Khởi tạo Supabase client an toàn
+    let supabaseClient = null;
+    try {
+      if (typeof supabase !== 'undefined' && !SUPABASE_URL.includes("YOUR_SUPABASE")) {
+        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       }
-    });
+    } catch (e) { console.warn("Supabase initialization deferred:", e); }
 
-    function loadLocalQuestions() {
-      fetch('./questions_data.json')
-        .then(res => res.json())
-        .then(data => { RAW_QUESTIONS = data; })
-        .catch(() => { console.log("Online/Local fetch ready"); });
+    // ==========================================================================
+    // 2. I18N DICTIONARY (EN / VI)
+    // ==========================================================================
+    let currentLang = 'en';
+    const i18n = {
+      en: {
+        brand: "IELTS Master CBT",
+        greeting: "Welcome back to IELTS CBT!",
+        subtitle: "Sharpen your skills with authentic computer-based tests.",
+        upgrade: "⭐ Upgrade Pro",
+        login: "Login",
+        logout: "Logout",
+        exit: "Exit Test",
+        submit: "Submit Test ▶",
+        hideHl: "👁️ Hide",
+        showHl: "👁️ Show",
+        clearHl: "🗑️ Clear",
+        allSkills: "All Skills",
+        startTest: "Start Test ▶",
+        reviewTest: "📖 Review",
+        retakeTest: "🔄 Retake"
+      },
+      vi: {
+        brand: "IELTS CBT Trực Tuyến",
+        greeting: "Chào mừng bạn quay trở lại!",
+        subtitle: "Luyện thi IELTS trên máy tính với giao diện chuẩn quốc tế 100%.",
+        upgrade: "⭐ Nâng Cấp Gói",
+        login: "Đăng Nhập",
+        logout: "Đăng Xuất",
+        exit: "Thoát Bài Thi",
+        submit: "Nộp Bài ▶",
+        hideHl: "👁️ Ẩn Vết",
+        showHl: "👁️ Hiện Vết",
+        clearHl: "🗑️ Xóa Vết",
+        allSkills: "Tất Cả",
+        startTest: "Bắt Đầu Làm ▶",
+        reviewTest: "📖 Xem Lại",
+        retakeTest: "🔄 Làm Lại"
+      }
+    };
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+      document.getElementById('lang-vi').classList.toggle('active', lang === 'vi');
+
+      const t = i18n[lang];
+      document.getElementById('txt-brand').textContent = t.brand;
+      document.getElementById('dash-greeting').textContent = t.greeting;
+      document.getElementById('dash-subtitle').textContent = t.subtitle;
+      document.getElementById('btn-upgrade-nav').textContent = t.upgrade;
+      document.getElementById('btn-exit-exam').textContent = t.exit;
+      document.getElementById('btn-submit-exam').textContent = t.submit;
+      document.getElementById('btn-clear-hl').textContent = t.clearHl;
+      updateAuthButtonText();
     }
 
-    // DEPARTMENT SELECTION LOGIC
-    deptSelect.addEventListener('change', () => {
-      if (deptSelect.value === 'CUSTOM') {
-        customDeptGroup.style.display = 'flex';
-        customDept.required = true;
-      } else {
-        customDeptGroup.style.display = 'none';
-        customDept.required = false;
+    // ==========================================================================
+    // 3. APP STATE
+    // ==========================================================================
+    let currentUser = null;
+    let currentExam = null;
+    let currentExamType = 'section'; // 'section' or 'full_test'
+    let currentSkill = 'reading';
+    let currentHighlightColor = 'yellow';
+    let isHighlightsHidden = false;
+    let studentAnswers = {};
+    let studentWriting = { task1: "", task2: "" };
+    let timerSeconds = 3600;
+    let timerInterval = null;
+    let tabSwitchCount = 0;
+    let isReviewMode = false;
+    let activeAuthMode = 'signin'; // 'signin' or 'signup'
+
+    // ==========================================================================
+    // 4. AUTHENTICATION & PROFILE ENGINE
+    // ==========================================================================
+    async function initAuth() {
+      if (!supabaseClient) return;
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (session && session.user) {
+        await loadUserProfile(session.user);
       }
-    });
+    }
 
-    // REGISTRATION & START
-    registrationForm.addEventListener('submit', (e) => {
-      e.preventDefault();
+    async function loadUserProfile(authUser) {
+      if (!supabaseClient) return;
+      const { data: profile } = await supabaseClient
+        .from('profiles')
+        .select('*')
+        .eq('id', authUser.id)
+        .single();
 
-      const dept = deptSelect.value === 'CUSTOM' ? customDept.value.trim() : deptSelect.value;
-      employeeInfo = {
-        fullName: document.getElementById('fullName').value.trim(),
-        department: dept,
-        seniority: document.getElementById('seniority').value,
-        birthYear: document.getElementById('birthYear').value
-      };
+      currentUser = profile || { id: authUser.id, full_name: authUser.email, role: 'student', tier: 'free' };
 
-      userBadge.textContent = employeeInfo.fullName + ' (' + employeeInfo.department + ')';
-      userBadge.style.display = 'block';
+      document.getElementById('user-display-name').textContent = currentUser.full_name;
+      const tierBadge = document.getElementById('user-tier-badge');
+      tierBadge.textContent = currentUser.tier.toUpperCase();
+      tierBadge.className = `header-badge badge-${currentUser.tier}`;
 
-      initQuizData();
-      startTimer();
-      setupTabSwitchListener();
+      if (currentUser.role === 'teacher' || currentUser.role === 'admin') {
+        document.getElementById('tab-btn-teacher').classList.remove('hidden');
+      }
 
-      welcomeScreen.classList.remove('active');
-      quizScreen.classList.add('active');
+      updateAuthButtonText();
+      loadDashboardData();
+    }
 
-      renderQuestion(0);
-      renderGrid();
-    });
+    function updateAuthButtonText() {
+      const btn = document.getElementById('btn-auth-action');
+      btn.textContent = currentUser ? i18n[currentLang].logout : i18n[currentLang].login;
+    }
 
-    // INIT & SHUFFLE QUESTIONS PER USER
-    function initQuizData() {
-      if (!RAW_QUESTIONS || RAW_QUESTIONS.length === 0) {
-        alert("Đang tải dữ liệu câu hỏi, vui lòng thử lại sau 2 giây!");
+    function handleAuthButtonClick() {
+      if (currentUser) {
+        if (confirm("Are you sure you want to sign out?")) {
+          if (supabaseClient) supabaseClient.auth.signOut();
+          currentUser = null;
+          document.getElementById('user-display-name').textContent = "Guest";
+          document.getElementById('user-tier-badge').textContent = "FREE";
+          document.getElementById('tab-btn-teacher').classList.add('hidden');
+          updateAuthButtonText();
+          loadDashboardData();
+        }
+      } else {
+        document.getElementById('modal-auth').classList.remove('hidden');
+      }
+    }
+
+    async function executeAuth() {
+      if (!supabaseClient) {
+        alert("Please configure Supabase URL & Anon Key in index.html first!");
         return;
       }
-      const optionKeys = ['A', 'B', 'C', 'D', 'E', 'F'];
+      const email = document.getElementById('auth-input-email').value.trim();
+      const password = document.getElementById('auth-input-password').value.trim();
+      const fullName = document.getElementById('auth-input-fullname').value.trim();
+      const errBox = document.getElementById('auth-error-msg');
+      errBox.classList.add('hidden');
 
-      const a1 = shuffleArray(RAW_QUESTIONS.filter(q => q.group === 'A1'));
-      const a2 = shuffleArray(RAW_QUESTIONS.filter(q => q.group === 'A2'));
-      const b1 = shuffleArray(RAW_QUESTIONS.filter(q => q.group === 'B1'));
-      const b2 = shuffleArray(RAW_QUESTIONS.filter(q => q.group === 'B2'));
-
-      allQuestions = [...a1, ...a2, ...b1, ...b2];
-
-      // Format clean option objects and shuffle options for each question
-      allQuestions.forEach(q => {
-        if (q.id === 'B2-Q09' || (q.correct && q.correct.indexOf(',') !== -1)) {
-          q.isMulti = true;
-        }
-        if (q.options && q.options.length > 0) {
-          q.optionsObj = q.options.map((optStr, idx) => {
-            const cleanText = String(optStr).replace(/^[A-E]\.\s*/, '').trim();
-            return {
-              key: optionKeys[idx] || String.fromCharCode(65 + idx),
-              text: cleanText
-            };
+      try {
+        if (activeAuthMode === 'signin') {
+          const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+          if (error) throw error;
+          await loadUserProfile(data.user);
+          closeModal('modal-auth');
+        } else {
+          const { data, error } = await supabaseClient.auth.signUp({
+            email, password, options: { data: { full_name: fullName } }
           });
-          q.shuffledOptionsObj = shuffleArray(q.optionsObj);
+          if (error) throw error;
+          alert("Registration successful! Welcome to IELTS CBT.");
+          await loadUserProfile(data.user);
+          closeModal('modal-auth');
         }
+      } catch (e) {
+        errBox.textContent = e.message;
+        errBox.classList.remove('hidden');
+      }
+    }
+
+    async function signInWithGoogle() {
+      if (!supabaseClient) return;
+      await supabaseClient.auth.signInWithOAuth({ provider: 'google' });
+    }
+
+    function toggleAuthMode() {
+      activeAuthMode = activeAuthMode === 'signin' ? 'signup' : 'signin';
+      document.getElementById('auth-modal-title').textContent = activeAuthMode === 'signin' ? "Sign In to IELTS CBT" : "Create Free Account";
+      document.getElementById('auth-group-fullname').classList.toggle('hidden', activeAuthMode === 'signin');
+      document.getElementById('btn-auth-submit').textContent = activeAuthMode === 'signin' ? "Sign In" : "Create Account";
+      document.getElementById('auth-switch-prompt').textContent = activeAuthMode === 'signin' ? "Don't have an account?" : "Already have an account?";
+      document.getElementById('auth-switch-btn').textContent = activeAuthMode === 'signin' ? "Sign Up" : "Sign In";
+    }
+
+    // ==========================================================================
+    // 5. DASHBOARD & MODULAR EXAM LOADER
+    // ==========================================================================
+    async function loadDashboardData() {
+      const grid = document.getElementById('exams-grid-container');
+      grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:30px;">Loading exams...</p>';
+
+      if (!supabaseClient) {
+        renderMockExams();
+        return;
+      }
+
+      try {
+        const { data: sections, error } = await supabaseClient
+          .from('exam_sections')
+          .select('*')
+          .eq('is_active', true)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        renderExamsList(sections || []);
+      } catch (e) {
+        renderMockExams();
+      }
+    }
+
+    function renderExamsList(exams) {
+      const grid = document.getElementById('exams-grid-container');
+      if (!exams || exams.length === 0) {
+        grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-muted);">No exams available.</p>';
+        return;
+      }
+
+      grid.innerHTML = exams.map(item => `
+        <div class="exam-card">
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <span class="skill-badge ${item.skill}">${item.skill.toUpperCase()}</span>
+              <span style="font-size:0.8em; color:var(--text-muted);">${item.section_type || 'Section'}</span>
+            </div>
+            <h3 style="font-size:1.1em; margin-bottom:6px;">${item.title}</h3>
+            <p style="font-size:0.85em; color:var(--text-muted); margin-bottom:12px;">
+              Duration: <strong>${item.time_minutes} mins</strong> | Code: <code>${item.section_code}</code>
+            </p>
+          </div>
+          <div style="border-top:1px solid var(--border-color); padding-top:12px;">
+            <button class="btn-primary" style="width:100%; justify-content:center;" onclick="startExamSection('${item.id}')">
+              ${i18n[currentLang].startTest}
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderMockExams() {
+      renderExamsList([
+        {
+          id: 'a1111111-1111-1111-1111-111111111111',
+          section_code: 'RD_P1_SAMPLE',
+          skill: 'reading',
+          section_type: 'Passage 1',
+          title: 'The Future of Driverless Cars',
+          time_minutes: 20,
+          is_free: true
+        }
+      ]);
+    }
+
+    // ==========================================================================
+    // 6. EXAM RUNNER & SMART HIGHLIGHT ENGINE
+    // ==========================================================================
+    async function startExamSection(sectionId) {
+      isReviewMode = false;
+      studentAnswers = {};
+      studentWriting = { task1: "", task2: "" };
+      tabSwitchCount = 0;
+
+      // Xóa highlight cũ khi làm lại (Auto-purge on retake)
+      clearAllHighlights();
+
+      if (!supabaseClient) {
+        // Nạp dữ liệu mẫu nếu chưa nối Supabase
+        loadMockExamContent();
+        return;
+      }
+
+      const { data: section } = await supabaseClient
+        .from('exam_sections')
+        .select('*')
+        .eq('id', sectionId)
+        .single();
+
+      if (!section) return;
+      currentExam = section;
+      currentExamType = 'section';
+      currentSkill = section.skill;
+
+      initExamRunnerUI(section.title, section.time_minutes);
+      document.getElementById('exam-left-panel').innerHTML = section.content_html || '<p>Audio/Instructions</p>';
+      document.getElementById('exam-right-panel').innerHTML = section.questions_html || '';
+
+      bindQuestionInputs();
+    }
+
+    function initExamRunnerUI(title, minutes) {
+      document.getElementById('view-dashboard').classList.add('hidden');
+      document.getElementById('view-exam-runner').classList.remove('hidden');
+      document.getElementById('app-footer').classList.remove('hidden');
+      document.getElementById('exam-timer-box').classList.remove('hidden');
+
+      if (currentSkill === 'reading') {
+        document.getElementById('reading-hl-toolbar').classList.remove('hidden');
+      }
+
+      timerSeconds = minutes * 60;
+      startExamTimer();
+      initHighlightSelectionListener();
+    }
+
+    function bindQuestionInputs() {
+      document.querySelectorAll('input[type="text"][data-q], .answer-input').forEach(inp => {
+        const q = inp.getAttribute('data-q');
+        inp.oninput = () => { studentAnswers[q] = inp.value.trim(); updateChips(); };
+      });
+      document.querySelectorAll('input[type="radio"]').forEach(rad => {
+        rad.onchange = () => {
+          const q = rad.name.replace(/\D/g, '') || rad.getAttribute('data-q');
+          if (rad.checked) { studentAnswers[q] = rad.value; updateChips(); }
+        };
+      });
+      renderChips();
+    }
+
+    function renderChips() {
+      const container = document.getElementById('footer-q-chips');
+      let html = '';
+      for (let i = 1; i <= 13; i++) {
+        html += `<div class="q-chip ${studentAnswers[i] ? 'answered' : ''}" id="chip-q-${i}" onclick="scrollToQuestion(${i})">${i}</div>`;
+      }
+      container.innerHTML = html;
+    }
+
+    function updateChips() {
+      for (let i = 1; i <= 13; i++) {
+        const chip = document.getElementById(`chip-q-${i}`);
+        if (chip) chip.classList.toggle('answered', !!studentAnswers[i]);
+      }
+    }
+
+    function scrollToQuestion(qNum) {
+      const el = document.querySelector(`[data-q="${qNum}"], input[name="q${qNum}"]`);
+      if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.focus(); }
+    }
+
+    // ==========================================================================
+    // 7. HIGHLIGHT TEXT SELECTION ENGINE
+    // ==========================================================================
+    function setHighlightColor(color, el) {
+      currentHighlightColor = color;
+      document.querySelectorAll('.hl-color-dot').forEach(d => d.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    function initHighlightSelectionListener() {
+      const leftPanel = document.getElementById('exam-left-panel');
+      leftPanel.onmouseup = () => {
+        const sel = window.getSelection();
+        if (!sel.isCollapsed && sel.rangeCount > 0) {
+          const range = sel.getRangeAt(0);
+          if (leftPanel.contains(range.commonAncestorContainer)) {
+            const mark = document.createElement('mark');
+            mark.className = `cbt-hl ${currentHighlightColor}`;
+            try {
+              range.surroundContents(mark);
+            } catch (e) {
+              console.warn("Complex highlight selection handled:", e);
+            }
+            sel.removeAllRanges();
+          }
+        }
+      };
+    }
+
+    function toggleHighlights() {
+      isHighlightsHidden = !isHighlightsHidden;
+      document.body.classList.toggle('hl-hidden', isHighlightsHidden);
+      document.getElementById('btn-toggle-hl').textContent = isHighlightsHidden ? i18n[currentLang].showHl : i18n[currentLang].hideHl;
+    }
+
+    function clearAllHighlights() {
+      const marks = document.querySelectorAll('#exam-left-panel mark.cbt-hl');
+      marks.forEach(m => {
+        const parent = m.parentNode;
+        while (m.firstChild) parent.insertBefore(m.firstChild, m);
+        parent.removeChild(m);
       });
     }
 
-    function shuffleArray(arr) {
-      const copy = [...arr];
-      for (let i = copy.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [copy[i], copy[j]] = [copy[j], copy[i]];
+    // ==========================================================================
+    // 8. SUBMISSION & GRADING
+    // ==========================================================================
+    async function confirmSubmitExam() {
+      if (!confirm("Are you sure you want to submit your test?")) return;
+      clearInterval(timerInterval);
+
+      if (!supabaseClient) {
+        // Mock Evaluation
+        document.getElementById('res-band-score').textContent = "8.0";
+        document.getElementById('res-score-summary').textContent = "Score: 3 / 3 (100%)";
+        document.getElementById('modal-results').classList.remove('hidden');
+        return;
       }
-      return copy;
+
+      try {
+        const { data, error } = await supabaseClient.rpc('submit_exam', {
+          p_target_type: currentExamType,
+          p_target_id: currentExam.id,
+          p_student_answers: studentAnswers,
+          p_time_spent: (currentExam.time_minutes * 60) - timerSeconds,
+          p_tab_switches: tabSwitchCount,
+          p_annotations: { highlights: [] }
+        });
+
+        if (error) throw error;
+
+        document.getElementById('res-band-score').textContent = data.bandScore;
+        document.getElementById('res-score-summary').textContent = `Score: ${data.score} / ${data.totalQuestions}`;
+        document.getElementById('explanation-content-body').innerHTML = data.explanationHTML || '<p>No explanation available.</p>';
+        document.getElementById('modal-results').classList.remove('hidden');
+
+      } catch (e) {
+        alert("Submission error: " + e.message);
+      }
     }
 
-    // TIMER LOGIC
-    function startTimer() {
+    function openReviewMode() {
+      closeModal('modal-results');
+      toggleExplanationDrawer();
+    }
+
+    function toggleExplanationDrawer() {
+      document.getElementById('explanation-drawer').classList.toggle('collapsed');
+    }
+
+    // ==========================================================================
+    // 9. LEADERBOARD & GAMIFICATION ENGINE
+    // ==========================================================================
+    async function loadLeaderboard(type = 'score') {
+      const tbody = document.getElementById('leaderboard-tbody');
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Loading rankings...</td></tr>';
+
+      if (!supabaseClient) {
+        tbody.innerHTML = `
+          <tr><td><span class="rank-badge rank-1">1</span></td><td><strong>Nguyễn Văn A</strong></td><td><span class="skill-badge reading">PRO</span></td><td>28</td><td><strong>8.5</strong></td><td>🔥 14 days</td></tr>
+          <tr><td><span class="rank-badge rank-2">2</span></td><td><strong>Trần Đình Phước</strong></td><td><span class="skill-badge writing">TEACHER</span></td><td>25</td><td><strong>8.5</strong></td><td>🔥 10 days</td></tr>
+          <tr><td><span class="rank-badge rank-3">3</span></td><td><strong>Lê Thị C</strong></td><td><span class="skill-badge grammar">FREE</span></td><td>19</td><td><strong>8.0</strong></td><td>🔥 7 days</td></tr>
+        `;
+        return;
+      }
+
+      const { data } = await supabaseClient.rpc('get_leaderboard', { p_type: type, p_limit: 100 });
+      tbody.innerHTML = (data || []).map((row, idx) => `
+        <tr>
+          <td><span class="rank-badge ${idx < 3 ? `rank-${idx + 1}` : ''}">${row.rank}</span></td>
+          <td><strong>${row.full_name}</strong></td>
+          <td><span class="skill-badge ${row.tier}">${row.tier.toUpperCase()}</span></td>
+          <td>${row.total_tests}</td>
+          <td><strong style="color:var(--success-green);">${row.avg_band}</strong></td>
+          <td>🔥 ${row.streak_days} days</td>
+        </tr>
+      `).join('');
+    }
+
+    // ==========================================================================
+    // 10. UPGRADE PRO & MOMO QR PAYMENT INTEGRATION
+    // ==========================================================================
+    function openUpgradeModal() {
+      document.getElementById('modal-upgrade').classList.remove('hidden');
+    }
+    function closeUpgradeModal() {
+      document.getElementById('modal-upgrade').classList.add('hidden');
+      document.getElementById('payment-qr-area').classList.add('hidden');
+    }
+
+    function selectPaymentPlan(planType, amount) {
+      if (!currentUser) {
+        alert("Please login first to upgrade your account.");
+        document.getElementById('modal-auth').classList.remove('hidden');
+        return;
+      }
+
+      const orderCode = `IELTS_${currentUser.id.substring(0, 6).toUpperCase()}_${Date.now().toString().slice(-4)}`;
+      const qrUrl = `https://api.vietqr.io/image/970422-0909000000-compact2.jpg?amount=${amount}&addInfo=${orderCode}&accountName=DINHPHUOC_EDUTECH`;
+
+      document.getElementById('payment-qr-image').src = qrUrl;
+      document.getElementById('payment-order-desc').textContent = `Order: ${orderCode} | Amount: ${amount.toLocaleString('vi-VN')} VND`;
+      document.getElementById('payment-qr-area').classList.remove('hidden');
+
+      // Lắng nghe Realtime WebSockets từ Supabase khi có tiền vào
+      if (supabaseClient) {
+        supabaseClient
+          .channel('payment_watch')
+          .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${currentUser.id}` }, payload => {
+            alert("🎉 Payment confirmed! Your account has been upgraded successfully.");
+            closeUpgradeModal();
+            loadUserProfile(currentUser);
+          })
+          .subscribe();
+      }
+    }
+
+    // ==========================================================================
+    // 11. GENERAL HELPERS & NAVIGATION
+    // ==========================================================================
+    function switchView(viewName) {
+      document.getElementById('view-dashboard').classList.toggle('hidden', viewName !== 'dashboard');
+      document.getElementById('view-exam-runner').classList.toggle('hidden', viewName !== 'exam');
+      document.getElementById('app-footer').classList.toggle('hidden', viewName !== 'exam');
+      document.getElementById('part-sub-header').classList.add('hidden');
+      document.getElementById('exam-timer-box').classList.add('hidden');
+      document.getElementById('reading-hl-toolbar').classList.add('hidden');
+    }
+
+    function switchDashTab(tabName, btn) {
+      document.querySelectorAll('.dash-nav-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+
+      document.getElementById('dash-tab-exams').classList.toggle('hidden', tabName !== 'exams');
+      document.getElementById('dash-tab-leaderboard').classList.toggle('hidden', tabName !== 'leaderboard');
+      document.getElementById('dash-tab-blog').classList.toggle('hidden', tabName !== 'blog');
+      document.getElementById('dash-tab-teacher').classList.toggle('hidden', tabName !== 'teacher');
+
+      if (tabName === 'leaderboard') loadLeaderboard('score');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.add('hidden');
+    }
+
+    function confirmExitExam() {
+      if (confirm("Do you want to exit? Your progress in this session will be lost.")) {
+        clearInterval(timerInterval);
+        switchView('dashboard');
+      }
+    }
+
+    function startExamTimer() {
+      clearInterval(timerInterval);
       timerInterval = setInterval(() => {
-        timerSeconds--;
         if (timerSeconds <= 0) {
           clearInterval(timerInterval);
-          if (submitModal) submitModal.classList.remove('active');
-          warningTitle.textContent = '⏱️ ĐÃ HẾT THỜI GIAN LÀM BÀI!';
-          warningText.textContent = 'Thời gian làm bài 1h15 phút đã kết thúc. Hệ thống đang tự động nộp bài làm của bạn...';
-          submitQuiz();
+          alert("Time is up!");
+          confirmSubmitExam();
           return;
         }
-
+        timerSeconds--;
         const m = Math.floor(timerSeconds / 60);
         const s = timerSeconds % 60;
-        timerDisplay.textContent = '⏱️ ' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
-
-        if (timerSeconds < 600) {
-          timerDisplay.classList.add('warning');
-        }
+        document.getElementById('exam-timer-text').textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
       }, 1000);
     }
 
-    // RENDER QUESTION
-    function renderQuestion(index) {
-      currentIndex = index;
-      const q = allQuestions[index];
-      const isMulti = q.isMulti || q.id === 'B2-Q09' || (q.correct && q.correct.includes(','));
+    function loadMockExamContent() {
+      currentExam = { title: "The Future of Driverless Cars", time_minutes: 20 };
+      currentSkill = "reading";
+      initExamRunnerUI("The Future of Driverless Cars", 20);
 
-      groupBadge.textContent = q.groupName || q.group;
-      pointsBadge.textContent = (q.points || 1) + ' Điểm';
+      document.getElementById('exam-left-panel').innerHTML = `
+        <h3>The Future of Driverless Cars</h3>
+        <p><strong>A.</strong> Autonomous vehicles, once the realm of science fiction, are rapidly becoming a reality on urban streets worldwide. Equipped with advanced lidar sensors, computer vision, and machine learning algorithms, driverless cars navigate complex traffic environments without human intervention.</p>
+        <p><strong>B.</strong> Proponents emphasize substantial safety benefits: over 90% of traffic collisions involve human error, which autonomous systems can significantly reduce. Furthermore, shared fleets could optimize route planning, lowering emissions and alleviating urban congestion.</p>
+      `;
 
-      let multiBadge = document.getElementById('multiBadge');
-      if (isMulti) {
-        if (!multiBadge) {
-          multiBadge = document.createElement('span');
-          multiBadge.id = 'multiBadge';
-          multiBadge.className = 'badge badge-multi';
-          multiBadge.textContent = '☑️ Chọn nhiều đáp án';
-          pointsBadge.parentNode.insertBefore(multiBadge, pointsBadge.nextSibling);
-        } else {
-          multiBadge.style.display = 'inline-flex';
-        }
-      } else if (multiBadge) {
-        multiBadge.style.display = 'none';
-      }
+      document.getElementById('exam-right-panel').innerHTML = `
+        <div class="question-group">
+          <p><strong>Questions 1-3: Fill in the blanks with NO MORE THAN TWO WORDS.</strong></p>
+          <div style="margin-bottom:15px;">1. Autonomous cars use lidar and <input type="text" class="answer-input" data-q="1" placeholder="Q1"> to understand surroundings.</div>
+          <div style="margin-bottom:15px;">2. Over 90% of collisions involve <input type="text" class="answer-input" data-q="2" placeholder="Q2">.</div>
+          <div style="margin-bottom:15px;">3. Shared fleets could lower <input type="text" class="answer-input" data-q="3" placeholder="Q3"> in cities.</div>
+        </div>
+      `;
 
-      updateBookmarkButton();
-
-      if (q.context) {
-        scenarioBox.style.display = 'block';
-        scenarioText.textContent = q.context;
-      } else {
-        scenarioBox.style.display = 'none';
-      }
-
-      questionTitle.textContent = (index + 1) + '. ' + q.question;
-
-      optionsList.innerHTML = '';
-      const opts = q.shuffledOptionsObj || q.optionsObj || [];
-
-      const currentSelectedKeys = userAnswers[q.id]
-        ? userAnswers[q.id].split(',').map(s => s.trim()).filter(Boolean)
-        : [];
-
-      opts.forEach((optObj) => {
-        const isSelected = isMulti
-          ? currentSelectedKeys.includes(optObj.key)
-          : userAnswers[q.id] === optObj.key;
-
-        const optDiv = document.createElement('div');
-        optDiv.className = 'option-item' + (isSelected ? ' selected' : '');
-        optDiv.innerHTML = `
-          <div class="option-radio ${isMulti ? 'checkbox' : ''}"></div>
-          <div class="option-text">${optObj.text}</div>
-        `;
-
-        optDiv.addEventListener('click', () => {
-          if (isMulti) {
-            let selectedArr = userAnswers[q.id]
-              ? userAnswers[q.id].split(',').map(s => s.trim()).filter(Boolean)
-              : [];
-            if (selectedArr.includes(optObj.key)) {
-              selectedArr = selectedArr.filter(k => k !== optObj.key);
-            } else {
-              selectedArr.push(optObj.key);
-            }
-            selectedArr.sort();
-            if (selectedArr.length > 0) {
-              userAnswers[q.id] = selectedArr.join(',');
-            } else {
-              delete userAnswers[q.id];
-            }
-          } else {
-            userAnswers[q.id] = optObj.key;
-          }
-
-          renderQuestion(currentIndex);
-          updateGridItem(currentIndex);
-          updateStats();
-        });
-
-        optionsList.appendChild(optDiv);
-      });
-
-      qProgressText.textContent = 'Câu ' + (index + 1) + ' / ' + allQuestions.length;
-      btnPrev.disabled = index === 0;
-
-      if (index === allQuestions.length - 1) {
-        btnNext.textContent = 'Nộp bài ➔';
-        btnNext.className = 'btn-nav btn-submit';
-      } else {
-        btnNext.textContent = 'Tiếp (→)';
-        btnNext.className = 'btn-nav btn-primary';
-      }
-
-      updateGridHighlight();
-      updateStats();
+      bindQuestionInputs();
     }
 
-    // BOOKMARK / FLAG LOGIC
-    btnBookmark.addEventListener('click', () => {
-      const q = allQuestions[currentIndex];
-      if (bookmarkedQuestions.has(q.id)) {
-        bookmarkedQuestions.delete(q.id);
-      } else {
-        bookmarkedQuestions.add(q.id);
-      }
-      updateBookmarkButton();
-      updateGridItem(currentIndex);
-      updateStats();
-      applyFilters();
+    // Khởi chạy ứng dụng
+    window.addEventListener('DOMContentLoaded', () => {
+      initAuth();
+      loadDashboardData();
     });
-
-    function updateBookmarkButton() {
-      const q = allQuestions[currentIndex];
-      const isBookmarked = bookmarkedQuestions.has(q.id);
-      if (isBookmarked) {
-        btnBookmark.classList.add('active');
-        bookmarkIcon.textContent = '🚩';
-        bookmarkText.textContent = 'Đã đánh dấu';
-      } else {
-        btnBookmark.classList.remove('active');
-        bookmarkIcon.textContent = '🚩';
-        bookmarkText.textContent = 'Đánh dấu';
-      }
-    }
-
-    // JUMP TO NEXT UNANSWERED
-    btnJumpUnanswered.addEventListener('click', jumpToNextUnanswered);
-
-    function jumpToNextUnanswered() {
-      let nextIdx = -1;
-      for (let i = currentIndex + 1; i < allQuestions.length; i++) {
-        if (!userAnswers[allQuestions[i].id]) {
-          nextIdx = i;
-          break;
-        }
-      }
-      if (nextIdx === -1) {
-        for (let i = 0; i < currentIndex; i++) {
-          if (!userAnswers[allQuestions[i].id]) {
-            nextIdx = i;
-            break;
-          }
-        }
-      }
-      if (nextIdx !== -1) {
-        renderQuestion(nextIdx);
-      } else {
-        openSubmitModal();
-      }
-    }
-
-    // NAVIGATION BUTTONS
-    btnPrev.addEventListener('click', () => {
-      if (currentIndex > 0) renderQuestion(currentIndex - 1);
-    });
-
-    btnNext.addEventListener('click', () => {
-      if (currentIndex < allQuestions.length - 1) {
-        renderQuestion(currentIndex + 1);
-      } else {
-        openSubmitModal();
-      }
-    });
-
-    // RENDER DASHBOARD GRID
-    function renderGrid() {
-      qGrid.innerHTML = '';
-      allQuestions.forEach((q, idx) => {
-        const item = document.createElement('div');
-        const isAns = !!userAnswers[q.id];
-        const isBkm = bookmarkedQuestions.has(q.id);
-
-        item.className = 'q-grid-item' + (isAns ? ' answered' : '') + (isBkm ? ' bookmarked' : '');
-        item.textContent = idx + 1;
-        item.dataset.index = idx;
-        item.dataset.group = q.group;
-        item.dataset.id = q.id;
-
-        item.addEventListener('click', () => {
-          renderQuestion(idx);
-          if (window.innerWidth <= 900) {
-            dashboardPanel.classList.remove('open');
-          }
-        });
-
-        qGrid.appendChild(item);
-      });
-      updateStats();
-    }
-
-    function updateGridItem(index) {
-      const q = allQuestions[index];
-      const gridItems = qGrid.children;
-      if (gridItems[index]) {
-        if (userAnswers[q.id]) gridItems[index].classList.add('answered');
-        else gridItems[index].classList.remove('answered');
-
-        if (bookmarkedQuestions.has(q.id)) gridItems[index].classList.add('bookmarked');
-        else gridItems[index].classList.remove('bookmarked');
-      }
-    }
-
-    function updateGridHighlight() {
-      Array.from(qGrid.children).forEach((item, idx) => {
-        if (idx === currentIndex) item.classList.add('active');
-        else item.classList.remove('active');
-      });
-    }
-
-    function updateStats() {
-      const total = allQuestions.length || 87;
-      const answered = Object.keys(userAnswers).length;
-      const unanswered = total - answered;
-      const bookmarked = bookmarkedQuestions.size;
-      const percent = Math.round((answered / total) * 100);
-
-      statAnsweredCount.textContent = answered;
-      statUnansweredCount.textContent = unanswered;
-      statBookmarkedCount.textContent = bookmarked;
-
-      progressPercentBadge.textContent = percent + '% (' + answered + '/' + total + ' câu)';
-      progressBarFill.style.width = percent + '%';
-    }
-
-    // GRID FILTERING
-    document.querySelectorAll('.filter-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        currentFilterStatus = tab.dataset.filter;
-        applyFilters();
-      });
-    });
-
-    document.querySelectorAll('.subtab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        document.querySelectorAll('.subtab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        currentFilterGroup = tab.dataset.group;
-        applyFilters();
-      });
-    });
-
-    function applyFilters() {
-      Array.from(qGrid.children).forEach((item, idx) => {
-        const q = allQuestions[idx];
-        if (!q) return;
-
-        const isAns = !!userAnswers[q.id];
-        const isBkm = bookmarkedQuestions.has(q.id);
-
-        let matchStatus = true;
-        if (currentFilterStatus === 'ANSWERED') matchStatus = isAns;
-        else if (currentFilterStatus === 'UNANSWERED') matchStatus = !isAns;
-        else if (currentFilterStatus === 'FLAGGED') matchStatus = isBkm;
-
-        let matchGroup = true;
-        if (currentFilterGroup !== 'ALL') matchGroup = q.group === currentFilterGroup;
-
-        if (matchStatus && matchGroup) {
-          item.style.display = 'flex';
-        } else {
-          item.style.display = 'none';
-        }
-      });
-    }
-
-    // KEYBOARD SHORTCUTS
-    document.addEventListener('keydown', (e) => {
-      if (!quizScreen.classList.contains('active')) return;
-      if (warningModal.classList.contains('active') || submitModal.classList.contains('active')) return;
-
-      const tag = document.activeElement.tagName;
-      if (['INPUT', 'SELECT', 'TEXTAREA'].includes(tag)) return;
-
-      if (e.key === 'ArrowLeft') {
-        if (currentIndex > 0) renderQuestion(currentIndex - 1);
-      } else if (e.key === 'ArrowRight') {
-        if (currentIndex < allQuestions.length - 1) renderQuestion(currentIndex + 1);
-      } else if (e.key === 'f' || e.key === 'F' || e.key === 'b' || e.key === 'B') {
-        btnBookmark.click();
-      } else if (e.key === 'u' || e.key === 'U') {
-        jumpToNextUnanswered();
-      } else if (['1', '2', '3', '4'].includes(e.key)) {
-        const q = allQuestions[currentIndex];
-        const isMulti = q.isMulti || (q.correct && q.correct.includes(','));
-        const opts = q.shuffledOptionsObj || q.optionsObj || [];
-        const idx = parseInt(e.key) - 1;
-        if (opts[idx]) {
-          const key = opts[idx].key;
-          if (isMulti) {
-            let selectedArr = userAnswers[q.id]
-              ? userAnswers[q.id].split(',').map(s => s.trim()).filter(Boolean)
-              : [];
-            if (selectedArr.includes(key)) {
-              selectedArr = selectedArr.filter(k => k !== key);
-            } else {
-              selectedArr.push(key);
-            }
-            selectedArr.sort();
-            if (selectedArr.length > 0) {
-              userAnswers[q.id] = selectedArr.join(',');
-            } else {
-              delete userAnswers[q.id];
-            }
-          } else {
-            userAnswers[q.id] = key;
-          }
-          renderQuestion(currentIndex);
-          updateGridItem(currentIndex);
-          updateStats();
-        }
-      }
-    });
-
-    // MOBILE DASHBOARD TOGGLE
-    btnToggleNav.addEventListener('click', () => {
-      dashboardPanel.classList.toggle('open');
-    });
-
-    // SUBMISSION MODAL LOGIC
-    btnSubmitEarly.addEventListener('click', openSubmitModal);
-
-    function openSubmitModal() {
-      const total = allQuestions.length;
-      const answeredCount = Object.keys(userAnswers).length;
-      const unAnsweredCount = total - answeredCount;
-      const percent = Math.round((answeredCount / total) * 100);
-
-      const grps = { A1: { total: 0, done: 0 }, A2: { total: 0, done: 0 }, B1: { total: 0, done: 0 }, B2: { total: 0, done: 0 } };
-      allQuestions.forEach(q => {
-        if (grps[q.group]) {
-          grps[q.group].total++;
-          if (userAnswers[q.id]) grps[q.group].done++;
-        }
-      });
-
-      if (answeredCount === total) {
-        submitModalIcon.className = 'modal-icon success';
-        submitModalIcon.textContent = '🎉';
-        submitModalTitle.textContent = 'HOÀN THÀNH 100% KHẢO SÁT!';
-        submitSummaryBox.innerHTML = `
-          <p style="color: #059669; font-weight:700; font-size:1rem; margin-bottom:8px;">
-            Chúc mừng! Bạn đã trả lời đầy đủ <strong>${total}/${total} câu hỏi</strong> (100%).
-          </p>
-          <p style="color: #475569; font-size: 0.88rem; line-height:1.5;">
-            Bạn có thể kiểm tra lại bài làm một lần nữa hoặc nhấn nút <strong>"Nộp bài ngay"</strong> bên dưới để hoàn thành khảo sát.
-          </p>
-        `;
-      } else {
-        submitModalIcon.className = 'modal-icon warning';
-        submitModalIcon.textContent = '📋';
-        submitModalTitle.textContent = 'XÁC NHẬN NỘP BÀI KHẢO SÁT';
-        submitSummaryBox.innerHTML = `
-          <p style="font-weight:700; font-size:0.95rem; margin-bottom:10px; color:#1e293b;">
-            Tiến độ bài làm: <span style="color:#4f46e5;">${answeredCount}/${total} câu</span> (${percent}%)
-          </p>
-          <div style="background:#fef2f2; border-left:4px solid #ef4444; padding:10px 12px; border-radius:6px; margin-bottom:12px; color:#991b1b; font-weight:600; font-size:0.88rem;">
-            ⚠️ Bạn còn <strong>${unAnsweredCount} câu chưa trả lời</strong>!
-          </div>
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; font-size:0.84rem; color:#475569;">
-            <div>• Nhóm A1: <strong>${grps.A1.done}/${grps.A1.total}</strong> câu</div>
-            <div>• Nhóm A2: <strong>${grps.A2.done}/${grps.A2.total}</strong> câu</div>
-            <div>• Nhóm B1: <strong>${grps.B1.done}/${grps.B1.total}</strong> câu</div>
-            <div>• Nhóm B2: <strong>${grps.B2.done}/${grps.B2.total}</strong> câu</div>
-          </div>
-        `;
-      }
-
-      submitModal.classList.add('active');
-    }
-
-    btnModalContinue.addEventListener('click', () => {
-      submitModal.classList.remove('active');
-      jumpToNextUnanswered();
-    });
-
-    btnModalSubmitConfirm.addEventListener('click', () => {
-      submitModal.classList.remove('active');
-      submitQuiz();
-    });
-
-    // ANTI-CHEAT: TAB SWITCH DETECTOR
-    let isSubmitting = false;
-
-    function setupTabSwitchListener() {
-      const handleTabSwitch = () => {
-        if (!document.hidden) return;
-        if (warningModal.classList.contains('active') || submitModal.classList.contains('active') || isSubmitting) return;
-
-        const now = Date.now();
-        if (now - lastBlurTime < 2000) return;
-        lastBlurTime = now;
-
-        tabSwitchCount++;
-
-        if (tabSwitchCount > 5) {
-          userAnswers = {}; // RESET ALL ANSWERS!
-          renderQuestion(currentIndex);
-          renderGrid();
-
-          warningTitle.textContent = 'BỊ RESET ĐÁP ÁN DO VI PHẠM!';
-          warningText.innerHTML = 'Bạn đã <strong>chuyển tab/cửa sổ quá 5 lần</strong>. Toàn bộ đáp án đã nhập bị xóa sạch! Thời gian vẫn đang tiếp tục đếm ngược.';
-        } else {
-          warningTitle.textContent = 'CẢNH BÁO CHUYỂN TAB (' + tabSwitchCount + '/5)';
-          warningText.innerHTML = 'Hệ thống ghi nhận bạn vừa rời khỏi màn hình khảo sát. <br><strong>Vi phạm quá 5 lần sẽ bị xóa toàn bộ đáp án!</strong>';
-        }
-
-        warningModal.classList.add('active');
-      };
-
-      document.addEventListener('visibilitychange', handleTabSwitch);
-    }
-
-    btnCloseModal.addEventListener('click', () => {
-      warningModal.classList.remove('active');
-    });
-
-    // SUBMIT LOGIC
-    function submitQuiz() {
-      isSubmitting = true;
-      clearInterval(timerInterval);
-
-      const payload = {
-        employee: employeeInfo,
-        answers: userAnswers,
-        tabSwitchCount: tabSwitchCount
-      };
-
-      warningTitle.textContent = 'ĐANG GỬI BÀI KHẢO SÁT...';
-      warningText.textContent = 'Vui lòng chờ trong giây lát.';
-      warningModal.classList.add('active');
-
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run
-          .withSuccessHandler(() => {
-            showFinalScreen();
-          })
-          .withFailureHandler(err => {
-            console.error(err);
-            showFinalScreen();
-          })
-          .submitQuizData(payload);
-      } else if (GAS_API_URL && GAS_API_URL.trim() !== '') {
-        fetch(GAS_API_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        }).then(() => {
-          showFinalScreen();
-        }).catch(err => {
-          console.error(err);
-          showFinalScreen();
-        });
-      } else {
-        setTimeout(() => {
-          showFinalScreen();
-        }, 1000);
-      }
-    }
-
-    function showFinalScreen() {
-      warningModal.classList.remove('active');
-      submitModal.classList.remove('active');
-      quizScreen.classList.remove('active');
-      finalScreen.classList.add('active');
-    }
   </script>
 </body>
 
